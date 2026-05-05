@@ -1,5 +1,46 @@
-# Vue 3 + Vite
+# 智选投票系统 (Voting System)
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+全开放 SaaS 型多方法投票平台，支持多种选举算法和投票交互方式。
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## 技术栈
+
+- **前端框架**: Vue 3 (Composition API + `<script setup>`)
+- **构建工具**: Vite 8
+- **UI 组件库**: Element Plus
+- **路由**: Vue Router 4
+- **图表**: ECharts + vue-echarts
+
+## 支持的投票算法
+
+| 算法 | 投票方式 | 结果展示 |
+|------|---------|---------|
+| 单选 | 点击选中一项 | 得票数柱状图 |
+| 多选 | 勾选多项 | 得票数柱状图 |
+| 权重分配 | 为每项分配分数，总分100 | 平均权重百分比 |
+| Borda 排序 | 按喜好排序 | 排名分柱状图 |
+| 打分制 | 每项 1-10 分评分 | 平均分柱状图 |
+
+## 快速开始
+
+```bash
+# 安装依赖
+npm install
+
+# 启动开发服务器
+npm run dev
+
+# 构建生产版本
+npm run build
+```
+
+## 页面结构
+
+| 路由 | 页面 | 说明 |
+|------|------|------|
+| `/` | 投票广场 | 投票列表、搜索、筛选、排序 |
+| `/vote/:id` | 参与投票 | 根据算法展示不同投票控件 |
+| `/results/:id` | 结果展示 | 图表 + 数据表格 |
+| `/create` | 创建投票 | 新建投票表单 |
+| `/mypolls` | 我的投票 | 创建和参与的投票 |
+| `/profile` | 个人主页 | 用户信息与认证 |
+| `/login` | 登录注册 | 账号登录与注册 |
