@@ -41,7 +41,11 @@
       </div>
       <el-dropdown trigger="click" @command="handleCommand">
         <div class="user-avatar">
-          <el-avatar :size="32" icon="UserFilled" />
+          <el-avatar 
+            :size="32" 
+            :src="user.avatar" 
+            icon="UserFilled" 
+          />
           <span class="username">{{ user.nickname }}</span>
           <el-icon><ArrowDown /></el-icon>
         </div>
@@ -71,9 +75,11 @@ import {
   TrendCharts, HomeFilled, Plus, Document,
   Search, UserFilled, ArrowDown, User, SwitchButton
 } from '@element-plus/icons-vue'
+// 🟢 确保这里的 currentUser 是从 mock 文件引入的响应式对象
 import { currentUser } from '../mock/polls.js'
 
 const router = useRouter()
+// 🟢 直接引用全局响应式对象，当 Profile.vue 修改它时，这里会自动更新
 const user = currentUser
 const searchQuery = ref('')
 const searchExpanded = ref(false)
@@ -154,5 +160,12 @@ const handleCommand = (cmd) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 🟢 额外补充：确保头像在导航栏内居中且不变形 */
+:deep(.el-avatar img) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 </style>
