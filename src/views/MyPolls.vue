@@ -9,17 +9,11 @@
 
     <el-tabs v-model="tab" class="polls-tabs">
       <el-tab-pane label="我创建的" name="created">
-        <div v-if="createdPolls.length" class="poll-grid">
-          <PollCard v-for="poll in createdPolls" :key="poll.id" :poll="poll" />
-        </div>
-        <el-empty v-else description="还没有创建过投票" :image-size="100" />
+        <VoteList :data="createdPolls" />
       </el-tab-pane>
 
       <el-tab-pane label="我参与的" name="voted">
-        <div v-if="votedPolls.length" class="poll-grid">
-          <PollCard v-for="poll in votedPolls" :key="poll.id" :poll="poll" />
-        </div>
-        <el-empty v-else description="还没有参与过投票" :image-size="100" />
+        <VoteList :data="votedPolls" />
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -29,7 +23,7 @@
 import { ref, computed } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { polls, currentUser } from '../mock/polls.js'
-import PollCard from '../components/PollCard.vue'
+import VoteList from '../components/VoteList.vue'
 
 const tab = ref('created')
 
