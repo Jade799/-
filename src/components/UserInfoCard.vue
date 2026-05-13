@@ -14,7 +14,7 @@
         <div class="name-row">
           <span class="nickname">{{ nickname }}</span>
         </div>
-        <p class="signature">个性签名：我们存在于一生仅此一次的当下</p>
+        <p class="signature">个性签名：{{ signature || '我们存在于一生仅此一次的当下' }}</p>
       </div>
 
       <div class="stats-panel">
@@ -37,7 +37,8 @@ import defaultAvatar from '../assets/head_portrait.png'
 defineProps({
   nickname: String,
   avatar: String, 
-  bgImage: String
+  bgImage: String,
+  signature: String
 })
 </script>
 

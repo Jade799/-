@@ -149,12 +149,24 @@ export const polls = reactive([
   }
 ])
 
+<<<<<<< HEAD
 // --- 用户信息 ---
 const DEFAULT_USER = {
   id: 'u001',
   nickname: '用户1004',
   avatar: defaultAvatar,
   bgImage: defaultBg,
+=======
+// --- 用户信息持久化 ---
+
+// 1. 定义初始默认值
+const DEFAULT_USER = {
+  id: 'u001',
+  nickname: '用户1004',
+  signature: '我们存在于一生仅此一次的当下',
+  avatar: defaultAvatar, // 初始头像不再为空
+  bgImage: defaultBg,    // 初始背景图
+>>>>>>> c0cf92f6bfe91cd9ae8996d51293bf14a4dc2e07
   isCertified: false,
   companyName: '',
   realName: ''
