@@ -7,6 +7,10 @@
           <span class="value">{{ initialUserInfo.nickname }}</span>
         </div>
         <div class="info-item">
+          <span class="label">个性签名</span>
+          <span class="value">{{ initialUserInfo.signature || '暂无签名' }}</span>
+        </div>
+        <div class="info-item">
           <span class="label">认证状态</span>
           <span class="value">
             <el-tag :type="initialUserInfo.isCertified ? 'success' : 'info'" size="small" effect="plain">
@@ -57,6 +61,16 @@
         <el-form-item label="昵称" prop="nickname">
           <el-input v-model="formData.nickname"></el-input>
         </el-form-item>
+
+        <el-form-item label="个性签名">
+          <el-input 
+            v-model="formData.signature" 
+            type="textarea" 
+            :rows="2" 
+            placeholder="写下你的个性签名..." 
+          />
+        </el-form-item>
+
         <el-form-item label="修改密码">
           <el-input v-model="formData.password" type="password" placeholder="不修改请留空" show-password></el-input>
         </el-form-item>
@@ -90,9 +104,11 @@ const formRef = ref(null)
 const avatarInputRef = ref(null)
 const bgInputRef = ref(null)
 
+// 在响应式对象中加入 signature
 const formData = reactive({ 
   nickname: '', 
   password: '', 
+  signature: '', 
   companyName: '', 
   realName: '',
   avatar: '',
@@ -105,6 +121,7 @@ const rules = {
 
 const openDialog = () => {
   formData.nickname = props.initialUserInfo.nickname || ''
+  formData.signature = props.initialUserInfo.signature || '' // 当前签名
   formData.companyName = props.initialUserInfo.companyName || ''
   formData.realName = props.initialUserInfo.realName || ''
   formData.avatar = props.initialUserInfo.avatar || ''
@@ -146,8 +163,10 @@ const submitForm = async () => {
       if (response.data.success) isCertified = true
     }
 
+    // 补充：在提交的数据中包含 signature，这样父组件和 UserInfo 才能同步
     const updatedData = {
       nickname: formData.nickname,
+      signature: formData.signature, // 签名
       companyName: formData.companyName,
       realName: formData.realName,
       avatar: formData.avatar,
@@ -166,11 +185,12 @@ const submitForm = async () => {
 </script>
 
 <style scoped>
+/* 保持你原有的样式不变 */
 .enterprise-panel-container { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid #f0f2f5; }
 .display-vertical { display: flex; flex-direction: column; gap: 18px; margin-bottom: 26px; }
 .info-item { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #f8fafc; }
 .info-item .label { font-size: 13px; color: #64748b; font-weight: 500; }
-.info-item .value { font-size: 14px; color: #0f172a; font-weight: 600; }
+.info-item .value { font-size: 14px; color: #0f172a; font-weight: 600; text-align: right; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .action-area { border-top: 1px solid #f1f5f9; padding-top: 20px; }
 .edit-btn { width: 100%; height: 42px; border-radius: 10px; font-weight: 600; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; cursor: pointer; }
 .appearance-edit-section { display: flex; gap: 30px; justify-content: center; margin-bottom: 20px; }
