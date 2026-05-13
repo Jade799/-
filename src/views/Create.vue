@@ -48,11 +48,7 @@
 
         <el-form-item label="投票选项" required>
           <div class="options-editor">
-            <div
-              v-for="(opt, idx) in form.options"
-              :key="idx"
-              class="option-row"
-            >
+            <div v-for="(opt, idx) in form.options" :key="idx" class="option-row">
               <span class="option-index">{{ idx + 1 }}</span>
               <el-input v-model="opt.label" :placeholder="'选项 ' + (idx + 1)" />
               <el-button
@@ -100,147 +96,75 @@ import {
   Sort as IconSort,
   Star as IconStar
 } from '@element-plus/icons-vue'
-import { algorithmLabels, algorithmColors } from '../mock/polls.js'
+import { algorithmLabels, algorithmColors, polls, currentUser } from '../mock/polls.js'
 
 const router = useRouter()
 
-const icons = {
-  single: 'CircleCheck',
-  multiple: 'Select',
-  weighted: 'TrendCharts',
-  borda: 'Sort',
-  scoring: 'Star'
-}
-
-const getIcon = (key) => {
-  const map = {
-    single: IconCheck,
-    multiple: IconSelect,
-    weighted: IconTrend,
-    borda: IconSort,
-    scoring: IconStar
-  }
-  return map[key] || IconCheck
-}
+const getIcon = (key) => ({
+  single: IconCheck, multiple: IconSelect,
+  weighted: IconTrend, borda: IconSort, scoring: IconStar
+}[key] || IconCheck)
 
 const algoDescriptions = {
-  single: '每人限选一项',
-  multiple: '每人可选多项',
-  weighted: '分配权重总分100',
-  borda: '按喜好排序',
-  scoring: '每项1-10分打分'
+  single: '每人限选一项', multiple: '每人可选多项',
+  weighted: '分配权重总分100', borda: '按喜好排序', scoring: '每项1-10分打分'
 }
 
 const form = reactive({
-  title: '',
-  description: '',
-  algorithm: 'single',
-  endAt: '',
-  options: [{ label: '' }, { label: '' }]
+  title: '', description: '', algorithm: 'single',
+  endAt: '', options: [{ label: '' }, { label: '' }]
 })
 
 const canCreate = computed(() =>
-  form.title.trim() &&
-  form.algorithm &&
-  form.endAt &&
-  form.options.every(o => o.label.trim()) &&
-  form.options.length >= 2
+  form.title.trim() && form.algorithm && form.endAt &&
+  form.options.every(o => o.label.trim()) && form.options.length >= 2
 )
 
 const disabledDate = (time) => time.getTime() < Date.now() - 86400000
 
 const onCreate = () => {
   if (!canCreate.value) return
-  ElMessage.success('投票已提交审核，请等待管理员审核通过。')
+
+  // ⭐ 真正插入到响应式 polls 数组
+  const newPoll = {
+    id: Date.now(),
+    title: form.title.trim(),
+    description: form.description.trim() || '暂无描述',
+    algorithm: form.algorithm,
+    status: 'pending',
+    createdAt: Date.now(),
+    endAt: new Date(form.endAt).getTime(),
+    totalVotes: 0,
+    creator: currentUser.nickname,
+    options: form.options.map((o, i) => ({
+      id: Date.now() + i + 1,
+      label: o.label.trim(),
+      count: 0
+    }))
+  }
+
+  polls.unshift(newPoll) // 插入到列表头部
+
+  ElMessage.success({
+    message: '投票已创建，等待审核通过后即可参与 🎉',
+    duration: 3000
+  })
   router.push('/mypolls')
 }
 </script>
 
 <style scoped>
-.create-page {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 24px;
-}
-.create-container {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  padding: 32px;
-}
-.page-title {
-  margin: 0 0 32px;
-  font-size: 24px;
-  color: #303133;
-  text-align: center;
-}
-.algo-radio-group {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
-  width: 100%;
-}
-.algo-radio-card {
-  flex: none !important;
-  margin-right: 0 !important;
-  height: 100%;
-}
-.algo-radio-card :deep(.el-radio__label) {
-  display: block;
-  width: 100%;
-  padding: 0;
-}
-.algo-radio-card :deep(.el-radio) {
-  display: flex;
-  align-items: flex-start;
-  height: 100%;
-}
-.algo-card-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 16px 12px;
-  border: 2px solid #e4e7ed;
-  border-radius: 10px;
-  transition: all 0.2s;
-  text-align: center;
-  min-width: 120px;
-}
-.algo-radio-card.is-checked .algo-card-inner {
-  border-color: #409eff;
-  background: #ecf5ff;
-}
-.algo-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #303133;
-}
-.algo-desc {
-  font-size: 11px;
-  color: #909399;
-}
-.options-editor {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.option-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.option-index {
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #409eff;
-  color: #fff;
-  border-radius: 50%;
-  font-size: 13px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
+.create-page { max-width: 800px; margin: 0 auto; padding: 24px; }
+.create-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 32px; }
+.page-title { margin: 0 0 32px; font-size: 24px; color: #303133; text-align: center; }
+.algo-radio-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; width: 100%; }
+.algo-radio-card { flex: none !important; margin-right: 0 !important; height: 100%; }
+.algo-radio-card :deep(.el-radio__label) { display: block; width: 100%; padding: 0; }
+.algo-card-inner { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 12px; border: 2px solid #e4e7ed; border-radius: 10px; transition: all 0.2s; text-align: center; min-width: 120px; }
+.algo-radio-card.is-checked .algo-card-inner { border-color: #409eff; background: #ecf5ff; }
+.algo-name { font-size: 14px; font-weight: 600; color: #303133; }
+.algo-desc { font-size: 11px; color: #909399; }
+.options-editor { display: flex; flex-direction: column; gap: 10px; }
+.option-row { display: flex; align-items: center; gap: 10px; }
+.option-index { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; background: #409eff; color: #fff; border-radius: 50%; font-size: 13px; font-weight: 600; flex-shrink: 0; }
 </style>

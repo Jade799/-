@@ -9,7 +9,7 @@
 
     <el-tabs v-model="tab" class="polls-tabs">
       <el-tab-pane label="我创建的" name="created">
-        <VoteList :data="createdPolls" />
+        <VoteList :data="createdPolls" @delete="handleDelete" />
       </el-tab-pane>
 
       <el-tab-pane label="我参与的" name="voted">
@@ -27,40 +27,24 @@ import VoteList from '../components/VoteList.vue'
 
 const tab = ref('created')
 
-// 模拟：用户自己创建的投票（根据 creator 字段匹配）
 const createdPolls = computed(() =>
   polls.filter(p => p.creator === currentUser.nickname)
 )
 
-// 模拟：已参与的投票（取前几个已结束的）
 const votedPolls = computed(() =>
-  polls.filter(p => p.status === 'ended').slice(0, 3)
+  polls.filter(p => p.status === 'ended').slice(0, 4)
 )
+
+// ⭐ 真正从响应式数组中删除
+const handleDelete = (item) => {
+  const idx = polls.findIndex(p => p.id === item.id)
+  if (idx !== -1) polls.splice(idx, 1)
+}
 </script>
 
 <style scoped>
-.mypolls-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-}
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-.page-header h1 {
-  margin: 0;
-  font-size: 24px;
-  color: #303133;
-}
-.poll-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 20px;
-}
-.polls-tabs :deep(.el-tabs__header) {
-  margin-bottom: 20px;
-}
+.mypolls-page { max-width: 1200px; margin: 0 auto; padding: 24px; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.page-header h1 { margin: 0; font-size: 24px; color: #303133; }
+.polls-tabs :deep(.el-tabs__header) { margin-bottom: 20px; }
 </style>
