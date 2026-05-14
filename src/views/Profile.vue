@@ -161,5 +161,5 @@ const handleUserUpdate = (newInfo) => {
 
 .sidebar-simple { display: flex; flex-direction: column; gap: 5px; }
 .menu-item { padding: 12px 20px; border-radius: 10px; cursor: pointer; color: #64748b; font-size: 14px; }
-.menu-item.active { background: #e0e7ff; color: #4f46e5; font-weight: 600; }
+.menu-item.active { background: #e0e7ff; color: #6392f1; font-weight: 600; }
 </style>

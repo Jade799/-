@@ -192,7 +192,7 @@ const submitForm = async () => {
 .info-item .label { font-size: 13px; color: #64748b; font-weight: 500; }
 .info-item .value { font-size: 14px; color: #0f172a; font-weight: 600; text-align: right; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .action-area { border-top: 1px solid #f1f5f9; padding-top: 20px; }
-.edit-btn { width: 100%; height: 42px; border-radius: 10px; font-weight: 600; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none; color: white; cursor: pointer; }
+.edit-btn { width: 100%; height: 42px; border-radius: 10px; font-weight: 600; background: linear-gradient(135deg, #6392f1 0%, #6392f1 100%); border: none; color: white; cursor: pointer; }
 .appearance-edit-section { display: flex; gap: 30px; justify-content: center; margin-bottom: 20px; }
 .upload-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .upload-label { font-size: 12px; color: #94a3b8; }
@@ -201,5 +201,5 @@ const submitForm = async () => {
 .bg-uploader { width: 120px; height: 80px; }
 .avatar-preview, .bg-preview { width: 100%; height: 100%; object-fit: cover; }
 .upload-placeholder { display: flex; justify-content: center; align-items: center; height: 100%; color: #8c939d; font-size: 20px; }
-:deep(.el-divider__text) { font-weight: bold; color: #4f46e5; }
+:deep(.el-divider__text) { font-weight: bold; color: #e16eaa; }
 </style>

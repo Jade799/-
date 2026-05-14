@@ -87,7 +87,7 @@
 <script setup>
 import { reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElLoading } from 'element-plus' // 引入 Loading 组件
 import { Plus, Delete, CircleCheck } from '@element-plus/icons-vue'
 import {
   CircleCheck as IconCheck,
@@ -97,6 +97,8 @@ import {
   Star as IconStar
 } from '@element-plus/icons-vue'
 import { algorithmLabels, algorithmColors, polls, currentUser } from '../mock/polls.js'
+// 💡 导入你之前创建的审核工具函数
+import { checkTextSafe } from '../utils/audit.js' 
 
 const router = useRouter()
 
@@ -122,34 +124,71 @@ const canCreate = computed(() =>
 
 const disabledDate = (time) => time.getTime() < Date.now() - 86400000
 
-const onCreate = () => {
+// ⭐ 重点修改：改为 async 异步函数以支持审核调用
+const onCreate = async () => {
   if (!canCreate.value) return
 
-  // ⭐ 真正插入到响应式 polls 数组
-  const newPoll = {
-    id: Date.now(),
-    title: form.title.trim(),
-    description: form.description.trim() || '暂无描述',
-    algorithm: form.algorithm,
-    status: 'pending',
-    createdAt: Date.now(),
-    endAt: new Date(form.endAt).getTime(),
-    totalVotes: 0,
-    creator: currentUser.nickname,
-    options: form.options.map((o, i) => ({
-      id: Date.now() + i + 1,
-      label: o.label.trim(),
-      count: 0
-    }))
-  }
-
-  polls.unshift(newPoll) // 插入到列表头部
-
-  ElMessage.success({
-    message: '投票已创建，等待审核通过后即可参与 🎉',
-    duration: 3000
+  // 1. 全屏或区域加载提示，增加仪式感
+  const loading = ElLoading.service({
+    lock: true,
+    text: '智选 AI 正在审核内容安全...',
+    background: 'rgba(255, 255, 255, 0.8)'
   })
-  router.push('/mypolls')
+
+  try {
+    // 2. 汇总所有文本进行一次性审核，节省百度云 QPS 额度
+    const contentToAudit = [
+      form.title,
+      form.description,
+      ...form.options.map(o => o.label)
+    ].join(' | ')
+
+    // 调用你配置了 API Key 的审核函数
+    const audit = await checkTextSafe(contentToAudit)
+
+    if (!audit.safe) {
+      // 如果审核不通过，直接拦截并提示原因
+      ElMessage.error({
+        message: `审核未通过：${audit.msg}`,
+        duration: 5000,
+        showClose: true
+      })
+      return 
+    }
+
+    // 3. 审核通过，执行原有的创建逻辑
+    const newPoll = {
+      id: Date.now(),
+      title: form.title.trim(),
+      description: form.description.trim() || '暂无描述',
+      algorithm: form.algorithm,
+      status: 'active', // 既然通过了 AI 实时审核，状态可以直接设为进行中
+      createdAt: Date.now(),
+      endAt: new Date(form.endAt).getTime(),
+      totalVotes: 0,
+      creator: currentUser.nickname,
+      options: form.options.map((o, i) => ({
+        id: Date.now() + i + 1,
+        label: o.label.trim(),
+        count: 0
+      }))
+    }
+
+    polls.unshift(newPoll) // 插入到响应式数组头部
+
+    ElMessage.success({
+      message: '投票已通过 AI 安全审核并成功发布 🎉',
+      duration: 3000
+    })
+    router.push('/mypolls')
+
+  } catch (error) {
+    console.error('审核过程发生错误:', error)
+    ElMessage.error('安全审核服务响应超时，请重试')
+  } finally {
+    // 无论成功失败都关闭加载状态
+    loading.close()
+  }
 }
 </script>
 

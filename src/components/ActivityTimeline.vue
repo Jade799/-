@@ -60,7 +60,7 @@ const activities = [
 /* 调整 Element Plus 时间轴样式以符合截图 */
 :deep(.el-timeline-item__node) {
   background-color: #fff;
-  border: 2px solid #6366f1;
+  border: 2px solid #6392f1;
 }
 
 :deep(.el-timeline-item__timestamp) {

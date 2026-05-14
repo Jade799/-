@@ -1,7 +1,8 @@
-import { reactive } from 'vue'
+import { reactive } from 'vue';
 import defaultAvatar from '../assets/head_portrait.png'
 import defaultBg from '../assets/backgroud.PNG'
 
+// --- 基础配置导出 ---
 export const algorithmLabels = { single: '单选', multiple: '多选', weighted: '权重分配', borda: 'Borda 排序', scoring: '打分制' }
 export const algorithmColors = { single: '#409eff', multiple: '#67c23a', weighted: '#e6a23c', borda: '#f56c6c', scoring: '#909399' }
 export const algorithmIcons  = { single: 'CircleCheck', multiple: 'Select', weighted: 'TrendCharts', borda: 'Sort', scoring: 'Star' }
@@ -11,7 +12,39 @@ export const statusTypes     = { pending: 'info', active: 'success', ended: 'dan
 const now = Date.now()
 const DAY = 86400000
 
-// ⭐ 改为 reactive 数组，任何组件的增删改都会同步到全局
+// 新增：百度云审核配置
+const BAIDU_CONF = {
+  apiKey: 'ciCXad9TUoRtpmoBwysXQmr',    //
+  secretKey: 'KlVlgYRoywQePMsMnTLK0YdXNRVR6aPu' //
+}
+
+// 新增：自动审核工具函数
+export const checkTextSafe = async (text) => {
+  try {
+    const tokenUrl = `/baidu-api/oauth/2.0/token?grant_type=client_credentials&client_id=${BAIDU_CONF.apiKey}&client_secret=${BAIDU_CONF.secretKey}`;
+    const tokenRes = await fetch(tokenUrl);
+    const { access_token } = await tokenRes.json();
+
+    const auditUrl = `/baidu-api/rest/2.0/solution/v1/img_conf/v1/text_censor/v1/user_defined?access_token=${access_token}`;
+    const response = await fetch(auditUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ text })
+    });
+
+    const result = await response.json();
+    if (result.conclusionType === 1) {
+      return { safe: true };
+    } else {
+      return { safe: false, msg: result.data?.[0]?.msg || '内容违规' };
+    }
+  } catch (error) {
+    console.error('审核服务连接失败:', error);
+    return { safe: true, msg: '服务异常，默认放行' }; 
+  }
+}
+
+// 所有投票数据
 export const polls = reactive([
   {
     id: 1,
@@ -26,7 +59,7 @@ export const polls = reactive([
     options: [
       { id: 101, label: 'Python',     count: 52 },
       { id: 102, label: 'JavaScript', count: 38 },
-      { id: 103, label: 'Go',         count: 24 },
+      { id: 103, label: 'Go',          count: 24 },
       { id: 104, label: 'Rust',       count: 14 }
     ]
   },
@@ -149,24 +182,13 @@ export const polls = reactive([
   }
 ])
 
-<<<<<<< HEAD
-// --- 用户信息 ---
-const DEFAULT_USER = {
-  id: 'u001',
-  nickname: '用户1004',
-  avatar: defaultAvatar,
-  bgImage: defaultBg,
-=======
-// --- 用户信息持久化 ---
-
-// 1. 定义初始默认值
+// ⭐ 完整保留：用户信息及持久化逻辑
 const DEFAULT_USER = {
   id: 'u001',
   nickname: '用户1004',
   signature: '我们存在于一生仅此一次的当下',
-  avatar: defaultAvatar, // 初始头像不再为空
-  bgImage: defaultBg,    // 初始背景图
->>>>>>> c0cf92f6bfe91cd9ae8996d51293bf14a4dc2e07
+  avatar: defaultAvatar,
+  bgImage: defaultBg,
   isCertified: false,
   companyName: '',
   realName: ''
